@@ -1,4 +1,3 @@
-<code>
 <script>
 var isMobile = false; //initiate as false
 // device detection
@@ -7,4 +6,3 @@ if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine
     isMobile = true;
 }
 </script>
-</code>
