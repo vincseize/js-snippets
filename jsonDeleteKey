@@ -1,0 +1,15 @@
+let pathJsonTracks = './data.json';
+$.getJSON(pathJsonTracks, function (data) {
+        $.each(data, function(key, val) { 
+            // check actif
+            if (val.actif === 'false'){
+                delete data[key];
+            }
+            // check category
+            if (val.categorie !== 'blue'){
+                delete data[key];
+            }
+        })
+    console.log(data);
+    myFunction(data);
+})
