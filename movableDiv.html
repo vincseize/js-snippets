@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MocapLab Draggable Div</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+
+<style>
+    :root {
+        --screen-aspect-ratio: 1;
+        --div-heightVW: 15vw;
+        --div-width: calc(var(--screen-aspect-ratio) * var(--div-heightVW));
+        /* --div-width: 160px;*/
+        --div-height: 120px; /* Change by js calculation ratio */
+        --divNavbar-height: 25px;
+        --divMargin: 10px;
+        --colorBlue1: #05ADF4;
+        --zoom-factor2: 2;
+    }
+
+    .scaled {
+        width: var(--div-width);
+        height: var(--div-height);
+        background-color: blue;
+        cursor: move;
+        position: relative;
+        transition: transform 0.3s;
+    }
+
+    .scaled-up2 {
+        transform: scale(var(--zoom-factor2));
+        transform-origin: bottom left; /* Set the transformation origin */
+        transition: transform 0.3s; /* Add a smooth transition effect */
+    }
+
+    #movable {
+        width: var(--div-width);
+        height: var(--div-height);
+        background-color: var(--colorBlue1);
+        cursor: default; /* Disable the move cursor on the #movable div */
+        position: relative;
+    }
+
+    #movableNavbar {
+        width: 100%;
+        height: var(--divNavbar-height);
+        background-color: lightgray;
+        position: absolute;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: move;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 5px;
+        flex-grow: 1;
+        justify-content: left;
+    }
+
+    .button-ZoomOut {
+        display: none;
+    }
+
+    .button-Drag {
+        width:100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        overflow: hidden;
+    }
+
+    .button-Drag img {
+        max-width: 100%;
+        max-height: 100%;
+        width: 25px;
+        height: 25px;
+        margin: 0;
+        padding: 0;
+    }
+
+</style>
+
+
+<div id="movable">
+    Drag me
+    <div id="movableNavbar">
+      <div class="button-group">
+        <button class="button-Restore" title="Restaurer">R</button>
+        <button class="button-ZoomIn" title="Agrandir">+</button>
+        <button class="button-ZoomOut" title="Réduire">-</button>
+        <div class="button-Drag">
+            <img src="./assets/drag_200.png" alt="Drag">
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+
+    $(document).ready(function() {
+
+        // Get the screen width and height
+        let screenWidth = window.screen.width;
+        let screenHeight = window.screen.height;
+
+        // Calculate the aspect ratio
+        let aspectRatio = screenWidth / screenHeight;
+
+        // Set the value to --screen-aspect-ratio
+        document.documentElement.style.setProperty('--screen-aspect-ratio', aspectRatio);
+
+        let divHeightVWcs = getComputedStyle(document.documentElement);
+        let divHeightVW = parseInt(divHeightVWcs.getPropertyValue('--div-heightVW').trim());
+        // console.log('divHeightVW:', divHeightVW);
+
+        // Get the window's viewport width
+        let viewportWidth = window.innerWidth;
+
+        // Calculate the equivalent value in pixels for 15vw
+        let divHeightInPixels = (divHeightVW * viewportWidth) / 100;
+
+        // Set the value to --div-height
+        document.documentElement.style.setProperty('--div-height', divHeightInPixels + 'px');
+
+        // Display the calculated aspect ratio
+        // console.log('Aspect Ratio:', aspectRatio);
+
+        // Get the value of the --div-width CSS variable
+        let divWidthPx = getComputedStyle(document.documentElement).getPropertyValue('--div-width').trim();
+        const divWidth = parseInt(divWidthPx);
+        let divHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--div-height').trim();
+        const divHeight = parseInt(divHeightPx);
+        let divNavbarHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--divNavbar-height').trim();
+        const divNavbarHeight = parseInt(divNavbarHeightPx);
+        let marginDivWindowPx = getComputedStyle(document.documentElement).getPropertyValue('--divMargin').trim();
+        const marginDivWindow = parseInt(marginDivWindowPx);
+
+        const divHeightTOT = divHeight+divNavbarHeight;
+
+        const initialX = 0;
+        const initialY = $(window).height() - divHeightTOT + marginDivWindow;
+
+        const scaleFactorMultiplicator = 1.5; // scale multiplicator
+
+        let scaleFactor = 1;
+
+        let margin = marginDivWindow;
+        let windowWidth = $(window).width();
+        let windowHeight = $(window).height();
+
+        // Set the initial position of #movable
+        $("#movable").css({
+            left: initialX,
+            top: initialY,
+            transform: "scale(1)",
+            transition: "transform 0.3s ease-in-out"
+        });
+
+        function logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, uiPosition, divHeightTOT) {
+            console.log("Right X Position: " + rightX);
+            console.log("Window Width: ", windowWidth);
+            console.log("Bottom Y Position: " + bottomY);
+            console.log("Window Height: ", windowHeight);
+            console.log("Zoom Factor: " + scaleFactor);
+            console.log("Position: ", uiPosition);
+            console.log("Total Height: ", divHeightTOT);
+        }
+
+        // Initialize draggable with containment options
+        function initializeDraggable() {
+            let leftMin = margin;
+            let topMin = margin;
+            let leftMax = windowWidth - divWidth - margin;
+            let topMax = windowHeight - divHeight - margin;
+
+            $("#movable").draggable({
+                containment: [leftMin, topMin, (leftMax*scaleFactor), topMax],
+                drag: function(event, ui) {
+
+                    let rightX = ui.position.left + ($(this).width() * scaleFactor);
+                    let bottomY = ui.position.top + ($(this).height());
+                    let maxRightX = windowWidth - (marginDivWindow * scaleFactor);
+                    let maxBottomY = windowHeight - (marginDivWindow * scaleFactor);
+
+                    if (rightX >= maxRightX) {
+                        ui.position.left = maxRightX - ($(this).width() * scaleFactor);
+                        // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
+                    }
+
+                    if (bottomY >= maxBottomY) {
+                        ui.position.top = maxBottomY - ($(this).height());
+                        // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
+                    }
+
+                    // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
+    
+                    
+                },
+                stop: function() {
+                    // $("html, body").css("overflow", "auto");
+                }
+            });
+
+        }
+
+        // Initially, disable dragging
+        initializeDraggable();
+
+        function updateContainment() {
+            // Get the current width of the #movable element
+            let movableWidth = $("#movable")[0].clientWidth;
+
+            // Recalculate window dimensions based on the current zoom factor
+            let windowWidth = $(window).width();
+            let windowHeight = $(window).height();
+
+            // Calculate the scaled margin based on the scale factor
+            let scaledMargin = margin * scaleFactor;
+            
+            // Update the containment boundaries based on the current zoom factor, scaled margin, and movable width
+            leftMax = windowWidth - movableWidth - scaledMargin;
+            topMax = windowHeight - (divHeight * scaleFactor) - scaledMargin;
+        }
+
+        ////////------------------ Add event handler for buttons
+
+        $(".button-Restore").on("click", function() {
+            // Reset the div to its initial position
+            $("#movable").css({
+                left: initialX,
+                top: initialY,
+                transform: "scale(1)",
+                transition: "transform 0.3s ease-in-out"
+            });
+            scaleFactor = 1;
+            $(".button-ZoomOut").css("display", "none");
+        });
+
+        $(".button-ZoomIn").on("click", function() {
+            scaleFactor *= scaleFactorMultiplicator;
+            $("#movable").css("transform-origin", "bottom left");
+            $("#movable").css("transform", "scale(" + scaleFactor + ")");
+            $(".button-ZoomOut").css("display", "block");
+            $(".button-ZoomOut").css("cursor", "pointer");
+            updateContainment();
+        });
+
+        $(".button-ZoomOut").on("click", function() {
+            if (scaleFactor > 1) { 
+                scaleFactor /= scaleFactorMultiplicator;
+                $("#movable").css("transform-origin", "bottom left");
+                $("#movable").css("transform", "scale(" + scaleFactor + ")");
+            }
+            if (scaleFactor <= 1) {
+                $(".button-ZoomOut").css("display", "none");
+            } else {
+                $(".button-ZoomOut").css("display", "block");
+                $(".button-ZoomOut").css("cursor", "pointer");
+            }
+        });
+
+        ////////------------------ 
+
+    });
+
+  </script>
+
+</body>
+</html>
