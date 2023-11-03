@@ -101,6 +101,8 @@
 
     $(document).ready(function() {
 
+        const movable = $("#movable");
+
         // Get the screen width and height
         const screenWidth = window.screen.width;
         const screenHeight = window.screen.height;
@@ -154,7 +156,7 @@
         let windowHeight = $(window).height();
 
         // Set the initial position of #movable
-        $("#movable").css({
+        movable.css({
             left: initialX,
             top: initialY,
             transform: "scale(1)",
@@ -178,7 +180,7 @@
             let leftMax = windowWidth - divWidth - margin;
             let topMax = windowHeight - divHeight - margin;
 
-            $("#movable").draggable({
+            movable.draggable({
                 containment: [leftMin, topMin, (leftMax*scaleFactor), topMax],
                 drag: function(event, ui) {
 
@@ -212,7 +214,7 @@
 
         function updateContainment() {
             // Get the current width of the #movable element
-            let movableWidth = $("#movable")[0].clientWidth;
+            let movableWidth = movable[0].clientWidth;
 
             // Recalculate window dimensions based on the current zoom factor
             let windowWidth = $(window).width();
@@ -230,7 +232,7 @@
 
         $(".button-Restore").on("click", function() {
             // Reset the div to its initial position
-            $("#movable").css({
+            movable.css({
                 left: initialX,
                 top: initialY,
                 transform: "scale(1)",
@@ -262,8 +264,8 @@
             if (scaleFactor < scaleMax) { 
                 scaleFactor *= scaleFactorMultiplicator;
                 if (movableWidthScaled*scaleFactor < screenWidth) { 
-                    $("#movable").css("transform-origin", "bottom left");
-                    $("#movable").css("transform", "scale(" + scaleFactor + ")");
+                    movable.css("transform-origin", "bottom left");
+                    movable.css("transform", "scale(" + scaleFactor + ")");
                     $(".button-ZoomOut").css("display", "block");
                     $(".button-ZoomOut").css("cursor", "pointer");
                     updateContainment();
@@ -274,8 +276,8 @@
         $(".button-ZoomOut").on("click", function() {
             if (scaleFactor > 1) { 
                 scaleFactor /= scaleFactorMultiplicator;
-                $("#movable").css("transform-origin", "bottom left");
-                $("#movable").css("transform", "scale(" + scaleFactor + ")");
+                movable.css("transform-origin", "bottom left");
+                movable.css("transform", "scale(" + scaleFactor + ")");
             }
             if (scaleFactor <= 1) {
                 $(".button-ZoomOut").css("display", "none");
