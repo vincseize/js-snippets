@@ -237,40 +237,27 @@ $("#movable").css({
         }
 
         if (storedScaleFactor) {
+            scaleFactor = parseFloat(storedScaleFactor);
+            const positionData = localStorage.getItem("position");
+            const position = JSON.parse(positionData);
+            const left = parseInt(position.left);
+            const top = parseInt(position.top);
 
-            // scaleFactor = parseFloat(storedScaleFactor);
+            // Adjust the left and top positions based on the scale factor
+            const adjustedLeft = left / scaleFactor;
+            const adjustedTop = top / scaleFactor;
 
-            // Reset the transform style before applying the new scale
-            // movable.css("transform", "none");
+            movable.css("transform-origin", "bottom left");
+            movable.css("transform", "scale(" + scaleFactor + ")");
+            // movable.css({ left: adjustedLeft, top: adjustedTop + "px" });
 
-            // TO DO BETTER
-            // movable.css("transform", `scale(${scaleFactor})`);
-            // movable.css("transform", `scale(1)`);
-            
-
+            movable.css({ left: adjustedLeft, top: adjustedTop + "px" });
 
             if (scaleFactor > 1) {
                 $(".button-ZoomOut").css("display", "block");
-                // DEBUG
-                // $(".button-ZoomOut").css("display", "none");
+                updateContainment();
             }
         }
-
-
-        // Set the initial position of #movable
-        // movable.css({
-        //     left: initialX,
-        //     top: initialY,
-        //     transform: "scale(1)",
-        //     transition: "transform 0.3s ease-in-out"
-        // });
-
-
-
-
-
-
-
 
 
         function logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, uiPosition, divHeightTOT) {
@@ -292,8 +279,15 @@ $("#movable").css({
 
             // Convert the position values to integers before storing
             const positionGet = movable.position();
-            const left = parseInt(positionGet.left);
-            const top = parseInt(positionGet.top);
+            // const left = parseInt(positionGet.left);
+            // const top = parseInt(positionGet.top);
+
+
+
+    const left = positionGet.left * scaleFactor; // Adjust for scale factor
+    const top = positionGet.top * scaleFactor; // Adjust for scale factor
+
+
 
             localStorage.setItem("position", JSON.stringify({ left, top }));
             localStorage.setItem("scaleFactor", scaleFactor.toString());
