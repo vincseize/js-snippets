@@ -242,31 +242,23 @@
 
         $(".button-ZoomIn").on("click", function() {
 
+            // Get the computed style of the element
+            const movableElement = document.getElementById('movable');
+            const computedStyle = getComputedStyle(movableElement);
 
-        // Get the computed style of the element
-        const movableElement = document.getElementById('movable');
-        const computedStyle = getComputedStyle(movableElement);
+            // Get the width property from the computed style
+            const movableWidthPX = computedStyle.getPropertyValue('width');
 
-        // Get the width property from the computed style
-        const movableWidthPX = computedStyle.getPropertyValue('width');
+            var trimmedValue = movableWidthPX.trim();
+            var movableWidth = parseFloat(trimmedValue);
 
-        var trimmedValue = movableWidthPX.trim();
-        var movableWidth = parseFloat(trimmedValue);
+            console.log(scaleFactor);
+            console.log(movableWidth);
 
-        // console.log(movableWidth);
-
-        // let marginDivWindowPx = getComputedStyle(document.documentElement).getPropertyValue('--divMargin').trim();
-        //         const marginDivWindow = parseInt(marginDivWindowPx);
-    
-        
-        console.log(scaleFactor);
-                console.log(movableWidth);
-
-                let movableWidthScaled = scaleFactor * movableWidth;
-                console.log("movableWidthScaled: ", movableWidthScaled);
-                console.log("screenWidth: ", screenWidth);
+            let movableWidthScaled = scaleFactor * movableWidth;
+            console.log("movableWidthScaled: ", movableWidthScaled);
+            console.log("screenWidth: ", screenWidth);
                 
-
             if (scaleFactor < scaleMax) { 
                 scaleFactor *= scaleFactorMultiplicator;
                 if (movableWidthScaled*scaleFactor < screenWidth) { 
