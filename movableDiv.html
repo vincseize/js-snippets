@@ -147,7 +147,7 @@
         const initialY = $(window).height() - divHeightTOT + marginDivWindow;
 
         const scaleFactorMultiplicator = 1.5; // scale multiplicator
-
+        const scaleMax = 3;
         let scaleFactor = 1;
 
         let margin = marginDivWindow;
@@ -169,7 +169,7 @@
             console.log("Window Height: ", windowHeight);
             console.log("Zoom Factor: " + scaleFactor);
             console.log("Position: ", uiPosition);
-            console.log("Total Height: ", divHeightTOT);
+            console.log("divHeightTOT error with scale: ", divHeightTOT);
         }
 
         // Initialize draggable with containment options
@@ -198,7 +198,7 @@
                         // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
                     }
 
-                    // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
+                    logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, $(this).height());
     
                     
                 },
@@ -243,12 +243,14 @@
         });
 
         $(".button-ZoomIn").on("click", function() {
-            scaleFactor *= scaleFactorMultiplicator;
-            $("#movable").css("transform-origin", "bottom left");
-            $("#movable").css("transform", "scale(" + scaleFactor + ")");
-            $(".button-ZoomOut").css("display", "block");
-            $(".button-ZoomOut").css("cursor", "pointer");
-            updateContainment();
+            if (scaleFactor < scaleMax) { 
+                scaleFactor *= scaleFactorMultiplicator;
+                $("#movable").css("transform-origin", "bottom left");
+                $("#movable").css("transform", "scale(" + scaleFactor + ")");
+                $(".button-ZoomOut").css("display", "block");
+                $(".button-ZoomOut").css("cursor", "pointer");
+                updateContainment();
+            }
         });
 
         $(".button-ZoomOut").on("click", function() {
