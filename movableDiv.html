@@ -18,7 +18,7 @@
         --divNavbar-height: 25px;
         --divMargin: 10px;
         --colorBlue1: #05ADF4;
-        --zoom-factor2: 2;
+        --zoom-factor: 2; /* Change by js value */
     }
 
     .scaled {
@@ -28,12 +28,6 @@
         cursor: move;
         position: relative;
         transition: transform 0.3s;
-    }
-
-    .scaled-up2 {
-        transform: scale(var(--zoom-factor2));
-        transform-origin: bottom left; /* Set the transformation origin */
-        transition: transform 0.3s; /* Add a smooth transition effect */
     }
 
     #movable {
@@ -103,11 +97,13 @@
 
 <script>
 
+
+
     $(document).ready(function() {
 
         // Get the screen width and height
-        let screenWidth = window.screen.width;
-        let screenHeight = window.screen.height;
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
 
         // Calculate the aspect ratio
         let aspectRatio = screenWidth / screenHeight;
@@ -134,6 +130,7 @@
         // Get the value of the --div-width CSS variable
         let divWidthPx = getComputedStyle(document.documentElement).getPropertyValue('--div-width').trim();
         const divWidth = parseInt(divWidthPx);
+        // console.log("divWidth: ", divWidth);
         let divHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--div-height').trim();
         const divHeight = parseInt(divHeightPx);
         let divNavbarHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--divNavbar-height').trim();
@@ -147,6 +144,8 @@
         const initialY = $(window).height() - divHeightTOT + marginDivWindow;
 
         const scaleFactorMultiplicator = 1.5; // scale multiplicator
+        // Set the value to --zoom-factor
+        document.documentElement.style.setProperty('--zoom-factor', scaleFactorMultiplicator);
         const scaleMax = 3;
         let scaleFactor = 1;
 
@@ -200,7 +199,6 @@
 
                     logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, $(this).height());
     
-                    
                 },
                 stop: function() {
                     // $("html, body").css("overflow", "auto");
@@ -243,13 +241,41 @@
         });
 
         $(".button-ZoomIn").on("click", function() {
+
+
+        // Get the computed style of the element
+        const movableElement = document.getElementById('movable');
+        const computedStyle = getComputedStyle(movableElement);
+
+        // Get the width property from the computed style
+        const movableWidthPX = computedStyle.getPropertyValue('width');
+
+        var trimmedValue = movableWidthPX.trim();
+        var movableWidth = parseFloat(trimmedValue);
+
+        // console.log(movableWidth);
+
+        // let marginDivWindowPx = getComputedStyle(document.documentElement).getPropertyValue('--divMargin').trim();
+        //         const marginDivWindow = parseInt(marginDivWindowPx);
+    
+        
+        console.log(scaleFactor);
+                console.log(movableWidth);
+
+                let movableWidthScaled = scaleFactor * movableWidth;
+                console.log("movableWidthScaled: ", movableWidthScaled);
+                console.log("screenWidth: ", screenWidth);
+                
+
             if (scaleFactor < scaleMax) { 
                 scaleFactor *= scaleFactorMultiplicator;
-                $("#movable").css("transform-origin", "bottom left");
-                $("#movable").css("transform", "scale(" + scaleFactor + ")");
-                $(".button-ZoomOut").css("display", "block");
-                $(".button-ZoomOut").css("cursor", "pointer");
-                updateContainment();
+                if (movableWidthScaled*scaleFactor < screenWidth) { 
+                    $("#movable").css("transform-origin", "bottom left");
+                    $("#movable").css("transform", "scale(" + scaleFactor + ")");
+                    $(".button-ZoomOut").css("display", "block");
+                    $(".button-ZoomOut").css("cursor", "pointer");
+                    updateContainment();
+                }
             }
         });
 
