@@ -174,56 +174,31 @@ let scaleFactor = 1;
         if (storedPosition) {
 
             const position0 = JSON.parse(storedPosition);
-            // const leftGet = parseInt(positio0n.left);
-            // const leftGet = parseInt(localStorage.getItem("left"));
-            // const topGet = parseInt(position0.top);
+            const positionData = localStorage.getItem("position");
+            const position = JSON.parse(positionData);
+            console.log("Left from localStorage:", position.left);
+            console.log("Top from localStorage:", position.top);
 
-            // console.log("localStorage position:", leftGet + " " + topGet);
-            // console.log("localStorage scaleFactor:", localStorage.getItem("scaleFactor"));
+            // Parse the left position with a fallback of 0
+            const leftGet = parseInt(position.left, 10);
+            const topGet = parseInt(position.top, 10);
 
-//             const position2 = JSON.parse(localStorage.getItem("position"));
-// console.log("Left from localStorage:", position2.left);
-// console.log("Top from localStorage:", position2.top);
+            console.log("Left from localStorage:", leftGet);
+            console.log("Top from localStorage:", topGet);
+            console.log("Scale from localStorage:", scaleFactor);
 
-
-//             movable.css("transform", "none");
-//             movable.css({ 
-//                 left: position2.left,
-//                 top: position2.top,
-//             });
-
-
-
-const positionData = localStorage.getItem("position");
-const position = JSON.parse(positionData);
-console.log("Left from localStorage:", position.left);
-console.log("Top from localStorage:", position.top);
-
-// Parse the left position with a fallback of 0
-const leftGet = parseInt(position.left, 10);
-const topGet = parseInt(position.top, 10);
-// if (storedScaleFactor) {
-//             scaleFactor = parseFloat(storedScaleFactor);
-// }
-
-console.log("Left from localStorage:", leftGet);
-console.log("Top from localStorage:", topGet);
-console.log("Scale from localStorage:", scaleFactor);
-
-scaleFactorDebug = 1; // debug
-
-movable.css("transform-origin", "bottom left");
-$("#movable").css({
-    left: leftGet,
-    top: topGet + "px",
-    // transform: "scale("+scaleFactorDebug+")",
-    transition: "transform 0.3s ease-in-out"
-});
+            movable.css("transform-origin", "bottom left");
+            $("#movable").css({
+                left: leftGet,
+                top: topGet + "px",
+                // transform: "scale("+scaleFactorDebug+")",
+                transition: "transform 0.3s ease-in-out"
+            });
 
 
 
 
-            // updateContainment();
+            updateContainment();
 
 
         } else {
