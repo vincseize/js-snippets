@@ -103,65 +103,175 @@
 
         const movable = $("#movable");
 
+
+
+let divHeightVWcs = getComputedStyle(document.documentElement);
+let divHeightVW = parseInt(divHeightVWcs.getPropertyValue('--div-heightVW').trim());
+// console.log('divHeightVW:', divHeightVW);
+
+// Get the window's viewport width
+let viewportWidth = window.innerWidth;
+
+// Calculate the equivalent value in pixels for 15vw
+let divHeightInPixels = (divHeightVW * viewportWidth) / 100;
+
+// Set the value to --div-height
+document.documentElement.style.setProperty('--div-height', divHeightInPixels + 'px');
+
+// Display the calculated aspect ratio
+// console.log('Aspect Ratio:', aspectRatio);
+
+// Get the value of the --div-width CSS variable
+let divWidthPx = getComputedStyle(document.documentElement).getPropertyValue('--div-width').trim();
+const divWidth = parseInt(divWidthPx);
+// console.log("divWidth: ", divWidth);
+let divHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--div-height').trim();
+const divHeight = parseInt(divHeightPx);
+let divNavbarHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--divNavbar-height').trim();
+const divNavbarHeight = parseInt(divNavbarHeightPx);
+let marginDivWindowPx = getComputedStyle(document.documentElement).getPropertyValue('--divMargin').trim();
+const marginDivWindow = parseInt(marginDivWindowPx);
+
+const divHeightTOT = divHeight+divNavbarHeight;
+
+const initialX = 0;
+const initialY = $(window).height() - divHeightTOT + marginDivWindow;
+
+const scaleFactorMultiplicator = 1.5; // scale multiplicator
+// Set the value to --zoom-factor
+document.documentElement.style.setProperty('--zoom-factor', scaleFactorMultiplicator);
+const scaleMax = 3;
+let scaleFactor = 1;
+
+
+
+
+
+
+
+
+
         // Get the screen width and height
         const screenWidth = window.screen.width;
         const screenHeight = window.screen.height;
-
-        // Calculate the aspect ratio
-        let aspectRatio = screenWidth / screenHeight;
-
-        // Set the value to --screen-aspect-ratio
-        document.documentElement.style.setProperty('--screen-aspect-ratio', aspectRatio);
-
-        let divHeightVWcs = getComputedStyle(document.documentElement);
-        let divHeightVW = parseInt(divHeightVWcs.getPropertyValue('--div-heightVW').trim());
-        // console.log('divHeightVW:', divHeightVW);
-
-        // Get the window's viewport width
-        let viewportWidth = window.innerWidth;
-
-        // Calculate the equivalent value in pixels for 15vw
-        let divHeightInPixels = (divHeightVW * viewportWidth) / 100;
-
-        // Set the value to --div-height
-        document.documentElement.style.setProperty('--div-height', divHeightInPixels + 'px');
-
-        // Display the calculated aspect ratio
-        // console.log('Aspect Ratio:', aspectRatio);
-
-        // Get the value of the --div-width CSS variable
-        let divWidthPx = getComputedStyle(document.documentElement).getPropertyValue('--div-width').trim();
-        const divWidth = parseInt(divWidthPx);
-        // console.log("divWidth: ", divWidth);
-        let divHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--div-height').trim();
-        const divHeight = parseInt(divHeightPx);
-        let divNavbarHeightPx = getComputedStyle(document.documentElement).getPropertyValue('--divNavbar-height').trim();
-        const divNavbarHeight = parseInt(divNavbarHeightPx);
-        let marginDivWindowPx = getComputedStyle(document.documentElement).getPropertyValue('--divMargin').trim();
-        const marginDivWindow = parseInt(marginDivWindowPx);
-
-        const divHeightTOT = divHeight+divNavbarHeight;
-
-        const initialX = 0;
-        const initialY = $(window).height() - divHeightTOT + marginDivWindow;
-
-        const scaleFactorMultiplicator = 1.5; // scale multiplicator
-        // Set the value to --zoom-factor
-        document.documentElement.style.setProperty('--zoom-factor', scaleFactorMultiplicator);
-        const scaleMax = 3;
-        let scaleFactor = 1;
 
         let margin = marginDivWindow;
         let windowWidth = $(window).width();
         let windowHeight = $(window).height();
 
+        // Calculate the aspect ratio
+        let aspectRatio = screenWidth / screenHeight;
+        // Set the value to --screen-aspect-ratio
+        document.documentElement.style.setProperty('--screen-aspect-ratio', aspectRatio);
+                
+
+
+
+        // Check if values are already in localStorage
+        const storedPosition = localStorage.getItem("position");
+        const storedScaleFactor = localStorage.getItem("scaleFactor");
+
+        if (storedPosition) {
+
+            const position0 = JSON.parse(storedPosition);
+            // const leftGet = parseInt(positio0n.left);
+            // const leftGet = parseInt(localStorage.getItem("left"));
+            // const topGet = parseInt(position0.top);
+
+            // console.log("localStorage position:", leftGet + " " + topGet);
+            // console.log("localStorage scaleFactor:", localStorage.getItem("scaleFactor"));
+
+//             const position2 = JSON.parse(localStorage.getItem("position"));
+// console.log("Left from localStorage:", position2.left);
+// console.log("Top from localStorage:", position2.top);
+
+
+//             movable.css("transform", "none");
+//             movable.css({ 
+//                 left: position2.left,
+//                 top: position2.top,
+//             });
+
+
+
+const positionData = localStorage.getItem("position");
+const position = JSON.parse(positionData);
+console.log("Left from localStorage:", position.left);
+console.log("Top from localStorage:", position.top);
+
+// Parse the left position with a fallback of 0
+const leftGet = parseInt(position.left, 10);
+const topGet = parseInt(position.top, 10);
+// if (storedScaleFactor) {
+//             scaleFactor = parseFloat(storedScaleFactor);
+// }
+
+console.log("Left from localStorage:", leftGet);
+console.log("Top from localStorage:", topGet);
+console.log("Scale from localStorage:", scaleFactor);
+
+scaleFactorDebug = 1; // debug
+
+movable.css("transform-origin", "bottom left");
+$("#movable").css({
+    left: leftGet,
+    top: topGet + "px",
+    // transform: "scale("+scaleFactorDebug+")",
+    transition: "transform 0.3s ease-in-out"
+});
+
+
+
+
+            // updateContainment();
+
+
+        } else {
+            // Set the initial position of #movable if no stored position is found
+            movable.css({
+                left: initialX,
+                top: initialY,
+                transform: "scale(1)",
+                transition: "transform 0.3s ease-in-out"
+            });
+        }
+
+        if (storedScaleFactor) {
+
+            // scaleFactor = parseFloat(storedScaleFactor);
+
+            // Reset the transform style before applying the new scale
+            // movable.css("transform", "none");
+
+            // TO DO BETTER
+            // movable.css("transform", `scale(${scaleFactor})`);
+            // movable.css("transform", `scale(1)`);
+            
+
+
+            if (scaleFactor > 1) {
+                $(".button-ZoomOut").css("display", "block");
+                // DEBUG
+                // $(".button-ZoomOut").css("display", "none");
+            }
+        }
+
+
         // Set the initial position of #movable
-        movable.css({
-            left: initialX,
-            top: initialY,
-            transform: "scale(1)",
-            transition: "transform 0.3s ease-in-out"
-        });
+        // movable.css({
+        //     left: initialX,
+        //     top: initialY,
+        //     transform: "scale(1)",
+        //     transition: "transform 0.3s ease-in-out"
+        // });
+
+
+
+
+
+
+
+
 
         function logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, uiPosition, divHeightTOT) {
             console.log("Right X Position: " + rightX);
@@ -171,6 +281,39 @@
             console.log("Zoom Factor: " + scaleFactor);
             console.log("Position: ", uiPosition);
             console.log("divHeightTOT error with scale: ", divHeightTOT);
+        }
+
+        function updateLocalStorage() {
+            console.log("updateLocalStorage: ");
+            // // Store position and scale factor in localStorage
+            // const positionGet = movable.position();
+            // localStorage.setItem("position", JSON.stringify(positionGet));
+            // localStorage.setItem("scaleFactor", scaleFactor.toString());
+
+            // Convert the position values to integers before storing
+            const positionGet = movable.position();
+            const left = parseInt(positionGet.left);
+            const top = parseInt(positionGet.top);
+
+            localStorage.setItem("position", JSON.stringify({ left, top }));
+            localStorage.setItem("scaleFactor", scaleFactor.toString());
+
+
+
+            // Check if values are already in localStorage
+            const storedPosition = localStorage.getItem("position");
+            const storedScaleFactor = localStorage.getItem("scaleFactor");
+
+
+
+            const position = JSON.parse(storedPosition);
+
+            console.log("localStorage position:", localStorage.getItem("position"));
+            console.log("localStorage scaleFactor:", localStorage.getItem("scaleFactor"));
+
+           
+
+
         }
 
         // Initialize draggable with containment options
@@ -199,11 +342,26 @@
                         // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
                     }
 
-                    logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, $(this).height());
-    
+                    // logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, divHeightTOT);
+                    
+                    
                 },
-                stop: function() {
-                    // $("html, body").css("overflow", "auto");
+                stop: function(event, ui) {
+                    let rightX = ui.position.left + (movable.width() * scaleFactor);
+                    let bottomY = ui.position.top + (movable.height());
+                    let maxRightX = windowWidth - (marginDivWindow * scaleFactor);
+                    let maxBottomY = windowHeight - (marginDivWindow * scaleFactor);
+
+                    if (rightX >= maxRightX) {
+                        ui.position.left = maxRightX - (movable.width() * scaleFactor);
+                    }
+
+                    if (bottomY >= maxBottomY) {
+                        ui.position.top = maxBottomY - (movable.height());
+                    }
+
+                    logPositionInfo(rightX, windowWidth, bottomY, windowHeight, scaleFactor, ui.position, movable.height());
+                    updateLocalStorage();
                 }
             });
 
@@ -240,6 +398,7 @@
             });
             scaleFactor = 1;
             $(".button-ZoomOut").css("display", "none");
+            updateLocalStorage();
         });
 
         $(".button-ZoomIn").on("click", function() {
@@ -254,7 +413,9 @@
             var trimmedValue = movableWidthPX.trim();
             var movableWidth = parseFloat(trimmedValue);
 
-            console.log(scaleFactor);
+            // if (!scaleFactor) {scaleFactor=1;} 
+
+            console.log("---scaleFactor: ",scaleFactor);
             console.log(movableWidth);
 
             let movableWidthScaled = scaleFactor * movableWidth;
@@ -263,13 +424,15 @@
                 
             if (scaleFactor < scaleMax) { 
                 scaleFactor *= scaleFactorMultiplicator;
-                if (movableWidthScaled*scaleFactor < screenWidth) { 
+                // DEBUG
+                // if (movableWidthScaled*scaleFactor < screenWidth) { 
                     movable.css("transform-origin", "bottom left");
                     movable.css("transform", "scale(" + scaleFactor + ")");
                     $(".button-ZoomOut").css("display", "block");
                     $(".button-ZoomOut").css("cursor", "pointer");
                     updateContainment();
-                }
+                    updateLocalStorage();
+                // }
             }
         });
 
@@ -278,6 +441,7 @@
                 scaleFactor /= scaleFactorMultiplicator;
                 movable.css("transform-origin", "bottom left");
                 movable.css("transform", "scale(" + scaleFactor + ")");
+                updateLocalStorage();
             }
             if (scaleFactor <= 1) {
                 $(".button-ZoomOut").css("display", "none");
