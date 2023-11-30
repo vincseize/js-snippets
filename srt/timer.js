@@ -25,6 +25,11 @@ function timeToSeconds(time) {
     return endTimeInSeconds;
 }
 
+// Function to get the current time in milliseconds
+function getCurrentTimeInMilliseconds() {
+    return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
+}
+
 // Function to update the timer
 function updateTimer(startTimeInMilliseconds, endTimeInMilliseconds) {
     // Format the time components
@@ -54,6 +59,26 @@ function updateTimer(startTimeInMilliseconds, endTimeInMilliseconds) {
     if (minutes * 60 + seconds + milliseconds / 1000 >= endTimeInMilliseconds / 1000) {
         clearInterval(timerInterval); // Stop the timer after reaching the end time
     }
+
+    // Check if there are subtitles
+    if (srtContent && srtContent.length > 0) {
+        // Loop through subtitles and check if the current time matches
+        srtContent.forEach((subtitle, index) => {
+            const startSubtitleTime = timeToMilliseconds(subtitle.startTime);
+            const stopSubtitleTime = timeToMilliseconds(subtitle.stopTime);
+    
+            if (
+                startSubtitleTime <= getCurrentTimeInMilliseconds() &&
+                getCurrentTimeInMilliseconds() <= stopSubtitleTime
+            ) {
+                // Update the subtitle container with the corresponding text
+                subtitleContainer.textContent = subtitle.text;
+            } else if (getCurrentTimeInMilliseconds() > stopSubtitleTime) {
+                // Clear the subtitle container if the endTime is reached
+                subtitleContainer.textContent = '';
+            }
+        });
+    }
 }
 
 // External function to set up the timer
@@ -68,3 +93,7 @@ function initTimer(startTime, endTime) {
     timerInterval = setInterval(() => updateTimer(startTimeInMilliseconds, endTimeInMilliseconds), 10);
 }
 
+// Example usage
+// const startTime = '00:00:00,000';
+// const endTime = '00:00:30,010';
+// initTimer(startTime, endTime);
